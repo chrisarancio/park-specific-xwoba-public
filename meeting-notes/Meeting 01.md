@@ -1,3 +1,4 @@
+## Meeting 01
 23 January 2025
 
 Meeting Notes
@@ -8,4 +9,4 @@ Meeting Notes
 Reading Assignment
 - [Introduction to Expected Weighted On-Base Average](https://technology.mlblogs.com/an-introduction-to-expected-weighted-on-base-average-xwoba-29d6070ba52b)
 - [Modeling xwOBA (With KNN)](https://medium.com/@thomasjamesnestico/modelling-xwoba-with-knn-9b004e93861a)
-- Chapters 2 & from *Mathletics*
+- Chapters 2 & 3 from *Mathletics*
