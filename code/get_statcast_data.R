@@ -3,7 +3,7 @@ library(tidyverse)
 
 all_res <- statcast_search("2024-03-20", "2024-03-21") # Seoul series
 next_date <- as.Date("2024-03-28")
-while (next_date <= "2024-10-30") {
+while (next_date <= "2024-09-30") {
   cat("Downloading data for", as.character(next_date), "\n")
   next_res <- statcast_search(next_date, next_date)
   if (nrow(next_res) > 0) {
