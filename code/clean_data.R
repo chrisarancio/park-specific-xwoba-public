@@ -20,7 +20,8 @@ df <- data %>%
 
 ## get only batted balls for training
 df_bip <- df %>%
-  filter(description == "hit_into_play") %>%
+  filter(description == "hit_into_play",
+         game_type != "S") %>%
   drop_na(launch_speed, launch_angle, ball_in_play) %>%
   select(game_date, batter, home_team, events, launch_speed, launch_angle, 
          woba_value, ball_in_play, total_bases)
