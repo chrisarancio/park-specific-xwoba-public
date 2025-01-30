@@ -1,0 +1,130 @@
+---
+title: "knn_xwoba"
+format: html
+editor: visual
+---
+
+## Modeling xwOBA with KNN in R
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+library(class)
+library(kknn)
+```
+
+```{r}
+cleaned_data <- readRDS("./Data/statcast2024_cleaned.rds")
+cleaned_data <- cleaned_data |>
+  select('launch_speed','launch_angle','total_bases') |>
+  mutate(total_bases = as.factor(total_bases))
+```
+
+Model spec
+
+```{r}
+knn_spec <- nearest_neighbor() |>
+  set_mode("classification") |>
+  set_engine(engine = "kknn") |>
+  set_args(neighbors = tune())
+```
+
+Variable spec
+
+```{r}
+variable_recipe <- recipe(total_bases ~ ., data = cleaned_data) |>
+  step_normalize(all_numeric_predictors())
+```
+
+Workflow spec (model + recipe)
+
+```{r}
+knn_workflow <- workflow() |>
+  add_recipe(variable_recipe) |>
+  add_model(knn_spec)
+```
+
+Using knn_workflow each time, build 20 knn models using a range of K tuning parameters from 1 to 40.
+
+Evaluate each model using 2-fold cross validation based on roc_auc metric
+
+```{r}
+set.seed(253)
+knn_models <- knn_workflow |>
+  tune_grid(
+    grid = grid_regular(neighbors(range = c(1,40)), levels = 20),
+    resamples = vfold_cv(cleaned_data, v = 2),
+    metrics = metric_set(roc_auc)
+  )
+```
+
+Comparing knn models and choosing which one to use
+
+```{r}
+knn_models |>
+  collect_metrics()
+```
+
+Plotting the different models
+
+```{r}
+knn_models |>
+  autoplot()
+```
+
+Finding the best k
+
+```{r}
+best_k <- knn_models |>
+  select_best(metric = "roc_auc")
+best_k
+```
+
+Getting accuracy for the model with the best k-value
+
+```{r}
+knn_models |>
+  collect_metrics() |>
+  filter(neighbors == best_k$neighbors)
+```
+
+Fitting model with the best k-value
+
+```{r}
+final_knn <- knn_workflow |>
+  finalize_workflow(parameters = best_k) |>
+  fit(data = cleaned_data)
+```
+
+Using fitted model to create classification predictions for total_bases based on launch_angle and launch_speed.
+
+```{r}
+cleaned_data_predictions_prob <- final_knn |>
+  predict(new_data = cleaned_data, type = "prob")
+```
+
+Creating a best prediction column that find the highest probability classification for every event based on the model's predictions.
+
+```{r}
+comparison <- cbind(cleaned_data$total_bases, cleaned_data_predictions_prob)
+comparison_best_results <- comparison |>
+  mutate(best_prediction = case_when(
+    .pred_0 == pmax(.pred_0, .pred_1, .pred_2, .pred_3, .pred_4) ~ 0,
+    .pred_1 == pmax(.pred_0, .pred_1, .pred_2, .pred_3, .pred_4) ~ 1,
+    .pred_2 == pmax(.pred_0, .pred_1, .pred_2, .pred_3, .pred_4) ~ 2,
+    .pred_3 == pmax(.pred_0, .pred_1, .pred_2, .pred_3, .pred_4) ~ 3,
+    .pred_4 == pmax(.pred_0, .pred_1, .pred_2, .pred_3, .pred_4) ~ 4
+  ))
+```
+
+Creating a match column where a 1 indicates that the best_prediction of the model and the real value are the same and 0 is where they do not match.
+
+```{r}
+accuracy <- comparison_best_results |>
+  mutate(match = case_when(
+    `cleaned_data$total_bases` == best_prediction ~ 1,
+    TRUE ~ 0
+  ))
+accuracy
+```
