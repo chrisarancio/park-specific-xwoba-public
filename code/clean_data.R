@@ -1,7 +1,7 @@
 library(dplyr)
 library(tidyr)
 
-data <- read.csv("raw-data/statcast2024.csv")
+data <- readRDS("raw-data/statcast2024.rds")
 
 ## add a column for batted balls 'ball_in_play'
 ## add a column for total bases
@@ -21,7 +21,7 @@ df <- data %>%
 ## get only batted balls for training
 df_bip <- df %>%
   filter(description == "hit_into_play",
-         game_type != "S") %>%
+         game_type == "R") %>%
   drop_na(launch_speed, launch_angle, ball_in_play) %>%
   select(game_date, batter, home_team, events, launch_speed, launch_angle, 
          woba_value, ball_in_play, total_bases)
