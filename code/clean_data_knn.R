@@ -32,14 +32,10 @@ df <- df |>
     events == 'home_run' ~ 2.050,
     TRUE ~ 0))
 
-## get only batted balls for training
-#df_bip <- df |>
-#  filter(ball_in_play == 1)
-
 #Select only the columns we need
 df_bip <- df |>
   filter(launch_speed > 0) |>
-  select(game_date, batter, home_team, events, launch_speed, launch_angle, 
+  select(game_date, batter, player_name, home_team, events, launch_speed, launch_angle, 
          woba, description, events, total_bases)
 
 saveRDS(df_bip, "./Data/statcast2024_cleaned.rds")
