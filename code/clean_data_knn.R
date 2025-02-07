@@ -32,6 +32,10 @@ df <- df |>
     events == 'home_run' ~ 2.050,
     TRUE ~ 0))
 
+#Saving the cleaned data before we remove all of the events where launch_speed > 0
+#Makes sure that the walk and strikeout data is included in final xwOBA calculation
+saveRDS(df, "./Data/statcast2024_cleaned_all_events.rds")
+
 #Select only the columns we need
 df_bip <- df |>
   filter(launch_speed > 0) |>
