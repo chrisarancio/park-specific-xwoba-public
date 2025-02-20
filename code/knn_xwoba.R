@@ -1,4 +1,5 @@
-library(tidyverse)
+#library(tidyverse)
+
 library(tidymodels)
 library(kknn)
 library(dplyr)
@@ -6,7 +7,7 @@ library(yardstick)
 library(ggplot2)
 
 #-----IMPORTING CLEANED DATA
-cleaned_data <- readRDS("./Data/statcast2024_cleaned.rds")
+cleaned_data <- readRDS("./data/statcast2024_cleaned.rds")
 cleaned_data <- cleaned_data |>
   select(launch_speed,launch_angle,total_bases) |>
   mutate(total_bases = as.factor(total_bases))
@@ -35,9 +36,9 @@ knn_workflow <- workflow() |>
 set.seed(253)
 knn_models <- knn_workflow |>
   tune_grid(
-    grid = grid_regular(neighbors(range = c(1,100)), levels = 20),
+    grid = grid_regular(neighbors(range = c(1,200)), levels = 20),
     resamples = vfold_cv(cleaned_data, v = 2),
-    metrics = metric_set(roc_auc)
+    metrics = metric_set(accuracy)
   )
 
 # Comparing knn models and choosing which one to use
@@ -50,7 +51,7 @@ knn_models |>
 
 # Finding the best k
 best_k <- knn_models |>
-  select_best(metric = "roc_auc")
+  select_best(metric = "accuracy")
 best_k
 
 # Getting accuracy for the model with the best k-value
@@ -63,13 +64,19 @@ final_knn <- knn_workflow |>
   finalize_workflow(parameters = best_k) |>
   fit(data = cleaned_data)
 
-saveRDS(final_knn, "./Data/best_knn_model.rds")
-knn_model_xwoba_saved <- readRDS("./Data/best_knn_model.rds")
+saveRDS(final_knn, "./data/best_knn_model.rds")
+knn_model_xwoba_saved <- readRDS("./data/best_knn_model.rds")
 #------
 
 #------PREDICT TOTAL BASES PROBABILITIES USING FITTED MODEL
 cleaned_data_predictions_prob <- knn_model_xwoba_saved |>
   predict(new_data = cleaned_data, type = "prob")
+
+#cleaned_data_predictions_prob <- final_knn |>
+#predict(new_data = cleaned_data, type = "prob")
+
+#saveRDS(cleaned_data_predictions_prob, "/Users/chrisa/Documents/GitHub/park-specific-xwoba/data/cleaned_data_predictions_prob_knn.rds")
+cleaned_data_predictions_prob <- readRDS("./data/cleaned_data_predictions_prob_knn.rds")
 
 #------TESTING ACCURACY---------
 comparison <- cbind(cleaned_data$total_bases, cleaned_data_predictions_prob)
@@ -94,7 +101,7 @@ amount_correctly_predicted_percentage <- (amount_correctly_predicted$n[2] / (amo
 #------------
 
 #-------CALCULATING xwOBACON----------
-#Weights for 0,1,2,3,4 total bases
+#Weights for 0,1,2,3,4 total bases for 2024 season
 woba_2024_weights <- c(0, 0.882, 1.254, 1.590, 2.050)
 total_bases_probs <- cleaned_data_predictions_prob[c('.pred_0','.pred_1','.pred_2','.pred_3','.pred_4')]
 
@@ -116,9 +123,11 @@ ggplot(xwOBACON_graph, aes(x = `cleaned_data$launch_speed`, y = `cleaned_data$la
 #----------
 
 #----------CALCULATING xwOBA
-final_df <- readRDS("./Data/statcast2024_cleaned_all_events.rds")
+final_df <- readRDS("./data/statcast2024_cleaned_all_events.rds")
 
-xwOBACON <- xwOBACON_graph |>
+xwOBACON_w_LA_and_LS <- cbind(xwOBACON, cleaned_data$launch_angle, cleaned_data$launch_speed)
+
+xwOBACON <- xwOBACON_xwOBACON_w_LA_and_LS |>
   select(`cleaned_data$launch_speed`, `cleaned_data$launch_angle`, xwOBACON) |>
   distinct()
 
@@ -133,26 +142,38 @@ final_df <- final_df |>
     TRUE ~ xwOBACON))
 
 cleaned_data_grouped_xwOBA <- final_df |>
-  group_by(player_name) |>
-  filter(n() > 100) |>
+  group_by(batter) |>
+  #filter(n() > 100) |>
   summarize(xwOBA = mean(xwOBA), woba = mean(woba))
 
-official_xwOBA_values <- read.csv("./Data/official_xwOBA_2024.csv")
-official_xwOBA_values <- official_xwOBA_values |>
-  rename(player_name = `last_name..first_name`) 
+#----------- COMPARING TO OFFICIAL MLB VALUES
+# Per Baseball Savant: "* Qualifiers: 2.1 PA per team game for batters, 1.25 PA per team game for pitchers."
+# URL: https://baseballsavant.mlb.com/leaderboard/expected_statistics 
+official_xwOBA_values <- readRDS("./data/mlb_xwoba_2024.rds")
 
 official_xwOBA_values <- official_xwOBA_values |>
-  select(player_name, X2024)
+  rename(player_id = `xMLBAMID`)
+
+official_xwOBA_values_by_player <- official_xwOBA_values |>
+  rename(official_xwoba = xwOBA)
+
+official_xwOBA_values_by_player <- official_xwOBA_values_by_player |>
+  select(player_id, official_xwoba)
 
 cleaned_data_grouped_xwOBA_compare <- cleaned_data_grouped_xwOBA |>
-  select(player_name, xwOBA)
-predicted_vs_official <- official_xwOBA_values |>
-  inner_join(cleaned_data_grouped_xwOBA_compare, join_by(`player_name` == `player_name`))
+  rename(player_id = `batter`)
+
+cleaned_data_grouped_xwOBA_compare <- cleaned_data_grouped_xwOBA_compare |>
+  select(player_id, xwOBA)
+
+predicted_vs_official <- official_xwOBA_values_by_player |>
+  inner_join(cleaned_data_grouped_xwOBA_compare, join_by(`player_id` == `player_id`))
 
 #Plotting predicted xwOBA vs official MLB values
-fit <- lm(data = predicted_vs_official, X2024 ~ xwOBA)
+fit <- lm(data = predicted_vs_official, official_xwoba ~ xwOBA)
 summary(fit)
-predicted_vs_official_plot <- ggplot(data = predicted_vs_official, aes(x = X2024, y = xwOBA)) + 
+
+predicted_vs_official_plot <- ggplot(data = predicted_vs_official, aes(x = official_xwoba, y = xwOBA)) + 
   geom_point() +
   stat_smooth(method = "lm", col = "red") +
   labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),

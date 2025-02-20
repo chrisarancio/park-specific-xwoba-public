@@ -1,7 +1,7 @@
 library(dplyr)
 library(tidyr)
 
-data <- readRDS("./Data/statcast2024(R).rds")
+data <- readRDS("./data/statcast2024(R).rds")
 data <- as_tibble(data)
 # Make sure that we are only considering data within the regular season
 data <- data |>
@@ -34,7 +34,7 @@ df <- df |>
 
 #Saving the cleaned data before we remove all of the events where launch_speed > 0
 #Makes sure that the walk and strikeout data is included in final xwOBA calculation
-saveRDS(df, "./Data/statcast2024_cleaned_all_events.rds")
+saveRDS(df, "./data/statcast2024_cleaned_all_events.rds")
 
 #Select only the columns we need
 df_bip <- df |>
@@ -42,5 +42,5 @@ df_bip <- df |>
   select(game_date, batter, player_name, home_team, events, launch_speed, launch_angle, 
          woba, description, events, total_bases)
 
-saveRDS(df_bip, "./Data/statcast2024_cleaned.rds")
+saveRDS(df_bip, "./data/statcast2024_cleaned.rds")
 
