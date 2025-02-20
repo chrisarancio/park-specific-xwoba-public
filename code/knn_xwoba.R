@@ -127,7 +127,7 @@ final_df <- readRDS("./data/statcast2024_cleaned_all_events.rds")
 
 xwOBACON_w_LA_and_LS <- cbind(xwOBACON, cleaned_data$launch_angle, cleaned_data$launch_speed)
 
-xwOBACON <- xwOBACON_xwOBACON_w_LA_and_LS |>
+xwOBACON <- xwOBACON_w_LA_and_LS |>
   select(`cleaned_data$launch_speed`, `cleaned_data$launch_angle`, xwOBACON) |>
   distinct()
 
@@ -140,6 +140,8 @@ final_df <- final_df |>
     events == 'strikeout' ~ 0,
     events == 'strikeout_double_play' ~ 0,
     TRUE ~ xwOBACON))
+
+#saveRDS(final_df, "./data/knn_xwOBA_ungrouped.rds")
 
 cleaned_data_grouped_xwOBA <- final_df |>
   group_by(batter) |>
