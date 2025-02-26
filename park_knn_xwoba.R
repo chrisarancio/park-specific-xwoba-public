@@ -138,23 +138,3 @@ cleaned_data_grouped_xwOBA <- final_df |>
 
 final_filename <- glue("./data/parks/xwoba/{park}_xwoba.rds")
 saveRDS(cleaned_data_grouped_xwOBA, final_filename)
-
-#----------- COMPARING TO OFFICIAL MLB VALUES
-# Per Baseball Savant: "* Qualifiers: 2.1 PA per team game for batters, 1.25 PA per team game for pitchers."
-# URL: https://baseballsavant.mlb.com/leaderboard/expected_statistics 
-official_xwOBA_values <- readRDS("./data/mlb_xwoba_2024.rds")
-
-official_xwOBA_values <- official_xwOBA_values |>
-  rename(player_id = `xMLBAMID`)
-
-official_xwOBA_values_by_player <- official_xwOBA_values |>
-  rename(official_xwoba = xwOBA)
-
-official_xwOBA_values_by_player <- official_xwOBA_values_by_player |>
-  select(player_id, official_xwoba)
-
-cleaned_data_grouped_xwOBA_compare <- cleaned_data_grouped_xwOBA |>
-  rename(player_id = `batter`)
-
-predicted_vs_official <- official_xwOBA_values_by_player |>
-  inner_join(cleaned_data_grouped_xwOBA_compare, join_by(`player_id` == `player_id`))
