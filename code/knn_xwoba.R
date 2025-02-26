@@ -146,7 +146,7 @@ final_df <- final_df |>
 cleaned_data_grouped_xwOBA <- final_df |>
   group_by(batter) |>
   #filter(n() > 100) |>
-  summarize(xwOBA = mean(xwOBA), woba = mean(woba))
+  summarize(xwOBA = mean(xwOBA, na.RM = TRUE), woba = mean(woba, na.rm = TRUE))
 
 #----------- COMPARING TO OFFICIAL MLB VALUES
 # Per Baseball Savant: "* Qualifiers: 2.1 PA per team game for batters, 1.25 PA per team game for pitchers."
