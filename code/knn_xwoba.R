@@ -146,7 +146,7 @@ final_df <- final_df |>
 cleaned_data_grouped_xwOBA <- final_df |>
   group_by(batter) |>
   #filter(n() > 100) |>
-  summarize(xwOBA = mean(xwOBA, na.RM = TRUE), woba = mean(woba, na.rm = TRUE))
+  summarize(xwOBA = mean(xwOBA, na.rm = TRUE), woba = mean(woba, na.rm = TRUE))
 
 #----------- COMPARING TO OFFICIAL MLB VALUES
 # Per Baseball Savant: "* Qualifiers: 2.1 PA per team game for batters, 1.25 PA per team game for pitchers."
@@ -170,6 +170,8 @@ cleaned_data_grouped_xwOBA_compare <- cleaned_data_grouped_xwOBA_compare |>
 
 predicted_vs_official <- official_xwOBA_values_by_player |>
   inner_join(cleaned_data_grouped_xwOBA_compare, join_by(`player_id` == `player_id`))
+
+saveRDS(predicted_vs_official, "./data/knn_xwoba_vs_mlb.rds")
 
 #Plotting predicted xwOBA vs official MLB values
 fit <- lm(data = predicted_vs_official, official_xwoba ~ xwOBA)
