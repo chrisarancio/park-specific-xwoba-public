@@ -151,6 +151,7 @@ final_df <- final_df |>
 
 cleaned_data_grouped_xwOBA <- final_df |>
   group_by(batter) |>
+#<<<<<<< Updated upstream
   #filter(n() > 100) |>
   #summarize(xwOBA = mean(xwOBA, na.rm = TRUE), woba = mean(woba, na.rm = TRUE))
 #=======
