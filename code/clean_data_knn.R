@@ -43,4 +43,3 @@ df_bip <- df |>
          woba, description, events, total_bases)
 
 saveRDS(df_bip, "./data/statcast2024_cleaned.rds")
-

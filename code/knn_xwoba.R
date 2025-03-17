@@ -114,8 +114,14 @@ xwOBACON <- total_bases_probs |>
 #-------
 
 #-------RECREATING STATCAST xwOBACON MODEL GRAPH FROM MEDIUM ARTICLE
+
+#pass aggregate in every distinct combo of launch angle and exit velocity
+
 #Recreating "Statcast xwOBACON Model" graph from xwOBA medium article
 xwOBACON_graph <- cbind(xwOBACON, cleaned_data$launch_angle, cleaned_data$launch_speed)
+
+#data.frame(LA = -10:50) |>
+#  crossing(data.frame(EV = 50:90))
 
 ggplot(xwOBACON_graph, aes(x = `cleaned_data$launch_speed`, y = `cleaned_data$launch_angle`, fill = xwOBACON)) +
   geom_tile() +
@@ -146,7 +152,11 @@ final_df <- final_df |>
 cleaned_data_grouped_xwOBA <- final_df |>
   group_by(batter) |>
   #filter(n() > 100) |>
-  summarize(xwOBA = mean(xwOBA, na.rm = TRUE), woba = mean(woba, na.rm = TRUE))
+  #summarize(xwOBA = mean(xwOBA, na.rm = TRUE), woba = mean(woba, na.rm = TRUE))
+#=======
+  filter(n() > 100) |>
+  summarize(xwOBA = mean(xwOBA), woba = mean(woba))
+#>>>>>>> Stashed changes
 
 #----------- COMPARING TO OFFICIAL MLB VALUES
 # Per Baseball Savant: "* Qualifiers: 2.1 PA per team game for batters, 1.25 PA per team game for pitchers."
@@ -185,3 +195,5 @@ predicted_vs_official_plot <- ggplot(data = predicted_vs_official, aes(x = offic
                      " Slope =",signif(fit$coef[[2]], 5),
                      " P =",signif(summary(fit)$coef[2,4], 5)))
 predicted_vs_official_plot
+
+#print the exit velocity and launch angle of the outliers of the final graph 
