@@ -34,7 +34,7 @@ for (park in parks) {
     select(player_id, team_name, player_name, official_xwOBA, all_of(home_park_xwoba)) |>
     rename(home_xwOBA = all_of(home_park_xwoba)) 
   
-  filtered$home_diff <- filtered$official_xwOBA - filtered$home_xwOBA
+  filtered$home_diff <- filtered$home_xwOBA - filtered$official_xwOBA
   home_diff_df <- bind_rows(home_diff_df, filtered)
 }
 
@@ -47,11 +47,12 @@ median_official_xwOBA <- median(home_diff_df$official_xwOBA)
 median_home_xwOBA <- median(home_diff_df$home_xwOBA)
 
 # Create the scatter plot
-ggplot(home_diff_df, aes(x = home_xwOBA, y = official_xwOBA)) +
+ggplot(home_diff_df, aes(x = official_xwOBA, y = home_xwOBA)) +
   geom_point(aes(color = value_color)) +
   geom_vline(xintercept = median_official_xwOBA, linetype = "dashed", color = "black") +
   geom_hline(yintercept = median_home_xwOBA, linetype = "dashed", color = "black") +
   geom_abline(slope = 1, intercept = 0, linetype = "solid", color = "blue") +
+  theme(legend.position = "none") +
   labs(
     title = "Official xwOBA vs Home xwOBA",
     x = "Official xwOBA",
