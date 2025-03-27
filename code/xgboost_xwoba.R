@@ -41,8 +41,8 @@ final_model <- xgb.train(
 
 search_grid <- expand.grid(
   max_depth = c(3,6),
-  eta = c(0.01, 0.1),
-  colsample_bytree = c(0.5, 0.7)
+  eta = c(0.01, 0.3),
+  colsample_bytree = c(0.5, 0.9)
 )
 
 best_auc <- 0
