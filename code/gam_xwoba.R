@@ -23,9 +23,12 @@ gam_model <- gam(list(total_bases ~ s(launch_speed, launch_angle),
               data = cleaned_data)
 summary(gam_model)
 
-cleaned_data_predictions_prob <- predict(gam_model, cleaned_data, type = "response")
+saveRDS(gam_model, "./data/best_gam_model.rds")
+gam_model_xwoba_saved <- readRDS("./data/best_gam_model.rds")
+
+cleaned_data_predictions_prob <- predict(gam_model_xwoba_saved, cleaned_data, type = "response")
 cleaned_data_predictions_prob <- as.data.frame(cleaned_data_predictions_prob)
-#comparison <- as_tibble(cleaned_data_predictions_prob)
+comparison <- as_tibble(cleaned_data_predictions_prob)
 
 # Calculating Accuracy
 comparison <- comparison |>
@@ -50,9 +53,6 @@ amount_correctly_predicted <- accuracy |>
   count(match == 1)
 amount_correctly_predicted_percentage <- (amount_correctly_predicted$n[2] / (amount_correctly_predicted$n[1] + amount_correctly_predicted$n[2])) * 100
 amount_correctly_predicted_percentage
-
-saveRDS(gam_model, "./data/best_gam_model.rds")
-gam_model_xwoba_saved <- readRDS("./data/best_gam_model.rds")
 
 #--------
 woba_2024_weights <- c(0, 0.882, 1.254, 1.590, 2.050)
@@ -140,3 +140,4 @@ predicted_vs_official_plot <- ggplot(data = predicted_vs_official, aes(x = offic
                      " Slope =",signif(fit$coef[[2]], 5),
                      " P =",signif(summary(fit)$coef[2,4], 5)))
 predicted_vs_official_plot
+
