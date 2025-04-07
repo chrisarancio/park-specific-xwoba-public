@@ -40,6 +40,7 @@ saveRDS(df, "./data/statcast2024_cleaned_all_events.rds")
 df_bip <- df |>
   filter(launch_speed > 0) |>
   select(game_date, batter, player_name, home_team, events, launch_speed, launch_angle, 
-         woba, description, events, total_bases)
+         woba, description, events, total_bases) |>
+  drop_na()
 
 saveRDS(df_bip, "./data/statcast2024_cleaned.rds")
