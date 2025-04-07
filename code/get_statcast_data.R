@@ -1,13 +1,14 @@
 library(baseballr)
 library(tidyverse)
 
-all_res <- statcast_search("2015-04-13", "2015-04-14", player_type = 'batter', stadium = 3)
+stadium_id <- 3
+all_res <- statcast_search("2015-04-13", "2015-04-14", player_type = 'batter', stadium = stadium_id)
 next_date <- as.Date("2015-04-15")
 while (next_date <= "2024-09-30") {
   if(weekly){
-    next_res <- statcast_search(next_date, next_date+7, player_type = 'batter', stadium = 3)
+    next_res <- statcast_search(next_date, next_date+7, player_type = 'batter', stadium = stadium_id)
   } else {
-    next_res <- statcast_search(next_date, next_date, player_type = 'batter', stadium = 3)
+    next_res <- statcast_search(next_date, next_date, player_type = 'batter', stadium = stadium_id)
   }
   if (nrow(next_res) > 0) {
     all_res <- all_res |> bind_rows(next_res)
