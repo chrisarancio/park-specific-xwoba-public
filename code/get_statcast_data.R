@@ -1,15 +1,13 @@
 library(baseballr)
 library(tidyverse)
 
-all_res <- statcast_search("2024-03-28", "2024-03-29", player_type = 'pitcher') # Regular season from March 28th - Sept 30th
-#saveRDS(all_res, "./Data/statcast2024TEST.rds")
-weekly = TRUE
-next_date <- as.Date("2024-03-30")
+all_res <- statcast_search("2015-04-13", "2015-04-14", player_type = 'batter', stadium = 3)
+next_date <- as.Date("2015-04-15")
 while (next_date <= "2024-09-30") {
   if(weekly){
-    next_res <- statcast_search(next_date, next_date+7, player_type = 'batter')
+    next_res <- statcast_search(next_date, next_date+7, player_type = 'batter', stadium = 3)
   } else {
-    next_res <- statcast_search(next_date, next_date, player_type = 'batter')
+    next_res <- statcast_search(next_date, next_date, player_type = 'batter', stadium = 3)
   }
   if (nrow(next_res) > 0) {
     all_res <- all_res |> bind_rows(next_res)
@@ -30,4 +28,4 @@ table(all_res$game_type)
 all_res <- all_res |>
   filter(game_type != "S")
 
-saveRDS(all_res, "./Data/statcast2024(R2).rds")
+# saveRDS(all_res, "./Data/fenway_statcast_all.rds")
