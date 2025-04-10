@@ -11,7 +11,7 @@ park <- "BOS"
 #-----
 
 #-----IMPORTING CLEANED DATA
-cleaned_data_park <- glue("./data/parks/data/{park}_statcast_cleaned.rds")
+cleaned_data_park <- glue("./data/new_parks/clean_data/{park}_statcast_cleaned.rds")
 #cleaned_data_park <- "./data/fenway_statcast_cleaned.rds"
 cleaned_data <- readRDS(cleaned_data_park)
 cleaned_data <- cleaned_data |>
@@ -116,7 +116,7 @@ xwOBACON <- total_bases_probs |>
 #-------
 
 #----------CALCULATING xwOBA
-park_cleaned_all_events <- glue("./data/new_parks/clean_data/{park}_cleaned_all_events.rds")
+park_cleaned_all_events <- glue("./data/new_parks/clean_data/{park}_statcast_cleaned_all_events.rds")
 final_df <- readRDS(park_cleaned_all_events)
 #final_df <- readRDS("./data/statcast2024_cleaned_all_events.rds")
 #final_df <- readRDS("./data/fenway_statcast_cleaned_all_events.rds")
