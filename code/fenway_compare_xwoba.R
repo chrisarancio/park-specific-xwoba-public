@@ -23,13 +23,16 @@ parks_and_mlb_xwoba <- parks_and_mlb_xwoba |>
 
 #saveRDS(parks_and_mlb_xwoba, "./data/parks_and_mlb_xwoba.rds")
 
-## new
-ggplot(cleaned_data, aes(x = launch_speed, y = launch_angle, fill = total_bases)) +
+## new (n = 46185)
+new_BOS_xwoba_pitch <- readRDS("./data/new_parks/xwoba/BOS_xwoba_pitch.rds") |> 
+  drop_na(launch_speed, launch_angle, xwOBACON)
+ggplot(new_BOS_xwoba_pitch, aes(x = launch_speed, y = launch_angle, fill = xwOBACON)) +
   geom_tile() +
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 2)
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 1)
 
 ## old 
-BOS_statcast2024_cleaned <- readRDS("./data/parks/data/BOS_statcast2024_cleaned.rds")
-ggplot(BOS_statcast2024_cleaned, aes(x = launch_speed, y = launch_angle, fill = total_bases)) +
+old_BOS_xwoba_pitch <- readRDS("./data/old_parks/BOS_xwoba_pitch.rds") |> 
+  drop_na(launch_speed, launch_angle, xwOBACON)
+ggplot(old_BOS_xwoba_pitch, aes(x = launch_speed, y = launch_angle, fill = xwOBACON)) +
   geom_tile() +
-  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 2)
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 1)
