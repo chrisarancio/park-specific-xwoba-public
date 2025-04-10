@@ -1,9 +1,10 @@
-library(baseballr)
+# library(baseballr)
 library(tidyverse)
 
-stadium_id <- 3
-all_res <- statcast_search("2015-04-13", "2015-04-14", player_type = 'batter', stadium = stadium_id)
-next_date <- as.Date("2015-04-15")
+stadium_id <- 680
+all_res <- statcast_search("2021-04-01", "2021-04-02", player_type = 'batter', stadium = stadium_id)
+weekly <- TRUE
+next_date <- as.Date("2021-04-03")
 while (next_date <= "2024-09-30") {
   if(weekly){
     next_res <- statcast_search(next_date, next_date+7, player_type = 'batter', stadium = stadium_id)
@@ -29,4 +30,4 @@ table(all_res$game_type)
 all_res <- all_res |>
   filter(game_type != "S")
 
-# saveRDS(all_res, "./Data/fenway_statcast_all.rds")
+# saveRDS(all_res, "./data/new_parks/raw_data/SEA_statcast_all.rds")
