@@ -1,5 +1,4 @@
-#library(tidyverse)
-
+library(tidyverse)
 library(tidymodels)
 library(kknn)
 library(dplyr)
@@ -12,11 +11,12 @@ park <- "BOS"
 #-----
 
 #-----IMPORTING CLEANED DATA
-cleaned_data_park <- glue("./data/parks/data/{park}_statcast2024_cleaned.rds")
+cleaned_data_park <- glue("./data/parks/data/{park}_statcast_cleaned.rds")
+#cleaned_data_park <- "./data/fenway_statcast_cleaned.rds"
 cleaned_data <- readRDS(cleaned_data_park)
 cleaned_data <- cleaned_data |>
   select(launch_speed,launch_angle,total_bases) |>
-  mutate(total_bases = as.factor(total_bases))
+  mutate(total_bases = factor(total_bases))
 #-----
 
 #-----DEFINING KNN WORKFLOW WITH TIDYMODELS
@@ -70,7 +70,8 @@ final_knn <- knn_workflow |>
   finalize_workflow(parameters = best_k) |>
   fit(data = cleaned_data)
 
-park_knn_model_file <- glue("./data/parks/knn/{park}_knn_model.rds")
+park_knn_model_file <- glue("./data/new_parks/knn_models/{park}_knn_model.rds")
+#park_knn_model_file <- "./data/fenway_knn_model.rds"
 saveRDS(final_knn, park_knn_model_file)
 knn_model_xwoba_saved <- readRDS(park_knn_model_file)
 #------
@@ -115,7 +116,10 @@ xwOBACON <- total_bases_probs |>
 #-------
 
 #----------CALCULATING xwOBA
-final_df <- readRDS("./data/statcast2024_cleaned_all_events.rds")
+park_cleaned_all_events <- glue("./data/new_parks/clean_data/{park}_cleaned_all_events.rds")
+final_df <- readRDS(park_cleaned_all_events)
+#final_df <- readRDS("./data/statcast2024_cleaned_all_events.rds")
+#final_df <- readRDS("./data/fenway_statcast_cleaned_all_events.rds")
 
 xwOBACON_w_LA_and_LS <- cbind(xwOBACON, cleaned_data$launch_angle, cleaned_data$launch_speed)
 
@@ -133,9 +137,13 @@ final_df <- final_df |>
     events == 'strikeout_double_play' ~ 0,
     TRUE ~ xwOBACON))
 
+park_xwoba_pitch_file <- glue("./data/new_parks/xwoba/{park}_xwoba_pitch.rds")
+saveRDS(final_df, park_xwoba_pitch_file)
+
 cleaned_data_grouped_xwOBA <- final_df |>
   group_by(batter) |>
   summarize(!!paste0(park, "_xwOBA") := mean(xwOBA, na.rm = TRUE))
 
-final_filename <- glue("./data/parks/xwoba/{park}_xwoba.rds")
+# final_filename <- "./data/fenway_xwoba.rds"
+final_filename <- glue("./data/new_parks/xwoba/{park}_xwoba_batter.rds")
 saveRDS(cleaned_data_grouped_xwOBA, final_filename)
