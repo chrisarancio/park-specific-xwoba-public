@@ -2,7 +2,7 @@ library(tidyverse)
 library(shiny)
 library(dplyr)
 
-data <- readRDS("final_parks_and_mlb_xwoba.rds")
+data <- readRDS("combined_df.rds")
 
 data <- data |>
   filter(!is.na(value))
@@ -10,7 +10,8 @@ data <- data |>
 players <- data |> 
   filter(type == "Player") |>
   select(player_name) |>
-  distinct()
+  distinct() |>
+  arrange(player_name)
 
 ui <- fluidPage(
   
@@ -74,7 +75,15 @@ server <- function(input, output, session) {
     one_player <- data |>
       filter(year == input$year_select, player_name == input$player_select | is.na(player_name))
     
-    ggplot(one_player, aes(x = park, y = value, fill = type)) +
+    one_player_fixed <- one_player |>
+      filter(type == "Player") |>
+      pull(park) |>
+      unique() -> parks_with_player_data
+    
+    one_player_fixed <- one_player |>
+      filter(type == "Player" | (type == "Average" & park %in% parks_with_player_data))
+    
+    ggplot(one_player_fixed, aes(x = park, y = value, fill = type)) +
       geom_bar(stat = "identity", position = position_dodge()) +
       scale_fill_brewer(name = NULL, palette = "Set1", labels = c("League Average", "Player Performance")) +
       labs(title = paste("Park xwOBA Differential for", input$year_select, input$player_select),
