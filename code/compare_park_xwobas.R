@@ -24,7 +24,7 @@ for (park in parks) {
   park_file <- glue("./data/new_parks/xwoba/{park}_xwoba_batter.rds")
   park_data <- readRDS(park_file)
   parks_and_mlb_xwoba <- parks_and_mlb_xwoba |>
-    inner_join(park_data, join_by(`player_id` == `batter`))
+    left_join(park_data, join_by(`player_id` == `batter`))
   
   for (year in c(2015:2019, 2021:2024)) {
     ## calculate difference between official xwoba and all parks 
@@ -49,6 +49,8 @@ player_df <- parks_and_mlb_xwoba |>
   ) |>
   select(player_id, player_name, park, year, diff)
 
+# saveRDS(player_df, "./data/new_parks/player_df.rds")
+
 # calculate average xwOBA increase/decrease at each park for each season
 park_avg_df <- parks_and_mlb_xwoba |>
   select(contains("_diff_")) |>
@@ -68,6 +70,8 @@ combined_df <- bind_rows(
 ) |>
   select(player_id, player_name, park, year, type, value) |>
   filter(!is.na(value))
+
+saveRDS(combined_df, "./data/new_parks/combined_df.rds")
 
 # select one player and year to graph (this will eventually be in shiny)
 player <- combined_df |> filter(year == 2022, player_id == 547180 | is.na(player_id))
