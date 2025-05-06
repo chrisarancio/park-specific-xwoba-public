@@ -12,3 +12,5 @@ This will be done by taking the xwOBA predictions for all events, subsetting the
 - The code to calculate xwOBA for each batter at each park for each year is in `code/park_xwoba_years.R`
 - The code to bring in the MLB official xwOBA values and construct the final dataframe used in the shiny dashboard is in `code/compare_park_xwobas.R`
 - For the final product of this project we did a shiny dashboard which can be found in `code/shiny/app.R`
+- An overview of the performance for the different machine learning models that we trained in the process of recreating xwOBA can be found in `analysis/Final Model Evaluations.docx`
+	- The code for the XGBoost and GAM models can be found in `code/xgboost_xwoba.R` and `code/gam_xwoba.R` respectively
