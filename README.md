@@ -29,5 +29,5 @@ For this project, it is important to note that these factors or weights indicate
 ## Example of Dashboard Created to View our Final Results
 <img width="909" height="710" alt="Screenshot 2026-05-31 at 4 11 36 PM" src="https://github.com/user-attachments/assets/184c0636-0373-4d9d-9281-797f4edc531b" />
 
-# What does this chart mean?
+## What does this chart mean?
 Using KNN models trained on pitches from each ballpark and the MLB wOBA weights for each year, we calculated a park-specific xwOBA for each player. We can then compare the average difference between the predicted park xwOBA and the MLB official xwOBA values for every player for the 2015-2024 seasons. These average differences for a certain season and ballpark can then be compared to a specific player's predicted xwOBA during that season and at that ballpark. These differences can highlight certain ballparks where a player may have overperformed or underperformed (compared to the average xwOBA) during a desired season. For example, one can examine which players have overperformed (in terms of xwOBA) at their home ballpark during various seasons.
