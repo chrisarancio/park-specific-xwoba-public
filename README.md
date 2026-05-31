@@ -1,7 +1,9 @@
 # Park-Specific xwOBA
 This project intends to create an open-source version of the Statcast xwOBA model. We trained a KNN, Extreme Gradient Boosting, and Generalized Additive Model (GAM) algorithms using official Statcast data. The best performing model (KNN) was then used in an analysis of a player's park-specific xwOBA.
   
-This will be done by taking the xwOBA predictions for all events, subsetting them by player and ballpark, and then taking the average difference between their ballpark-specific xwOBA and that ballpark's average xwOBA for all players. These differences can be visualized for every player for ten different ballparks from the 2015-2024 seasons using our Shiny application. These visualizations can help answer questions like: 
+This will be done by taking the xwOBA predictions for all events, subsetting them by player and ballpark, and then taking the average difference between their ballpark-specific xwOBA and that ballpark's average xwOBA for all players. These differences can be visualized for every player for ten different ballparks from the 2015-2024 seasons using our Shiny application. 
+
+**These visualizations can help answer questions like:**
 1. What players have the highest modeled xwOBAs at each ballpark?
 2. How do the modeled xwOBAs compare to the official season-long values?
 3. Which players have a higher predicted xwOBA stat at their home ballpark?
